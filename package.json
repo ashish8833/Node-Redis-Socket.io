@@ -1,0 +1,22 @@
+{
+  "name": "socket-cluster",
+  "version": "1.0.0",
+  "description": "socket-cluster",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ashish Kadam (Full Stack Developer)",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "cluster": "^0.7.7",
+    "express": "^4.16.3",
+    "jade": "^1.11.0",
+    "morgan": "^1.9.0",
+    "os": "^0.1.1",
+    "redis": "^2.8.0",
+    "socket.io": "^2.0.4",
+    "socket.io-redis": "^5.2.0"
+  }
+}
