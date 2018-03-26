@@ -3,9 +3,19 @@ const express = require('express');
 const path = require('path');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
-const redis = require('socket.io-redis');
+const redisSocket = require('socket.io-redis');
 const app = module.exports = express();
+const redis = require('redis');
 app.set('port', process.env.PORT || 3000);
+
+/***** Redis Connection ******/
+
+let redisClient = redis.createClient();
+redisClient.on('connect',function(){
+    console.log('Redis connected')
+});
+
+/***** Redis Connection ******/
 
 const server = app.listen(app.get('port'), () => {
     console.log('Express server listening on port ' + app.get('port'));
@@ -13,11 +23,12 @@ const server = app.listen(app.get('port'), () => {
 
 const io_s = require('socket.io')(server);
 
-io_s.adapter(redis({
+io_s.adapter(redisSocket({
     host: 'localhost',
     port: 6379
 }));
 
+// Set namespace for socket, it's most important for load balancing.
 const io = io_s.of('mynamespace');
 
 // view engine setup
@@ -59,6 +70,9 @@ app.get('/', (req, res) => {
 
 io.on('connection', (socket) => {
     console.log('connection call');
+    io.adapter.clients((err, clients) => {
+        console.log(clients); // an array containing all connected socket ids
+    });
     socket.on('message-all', (data) => {
         io.emit('message-all', data);
     });
@@ -75,8 +89,11 @@ io.on('connection', (socket) => {
     });
 
 
+    
 });
 
 app.get('/clients', (req, res, next) => {
     res.send(Object.keys(io.connected));
 });
+
+// PORT=3000 pm2 start index.js --name "3000"
