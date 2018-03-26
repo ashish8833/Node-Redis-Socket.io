@@ -1,4 +1,4 @@
-# Redis Socket.io Integration
+# Node Redis Socket.io Integration
 
 ## Problem
 Node.js has single thread application, if you have multiple core **CPU**, Node application use only one core, can't get advantage of mutiple core **CPU**. For **REST-API**, it's easy to generate multiple copy of node project that runs on different port, but for socket can't mange.
