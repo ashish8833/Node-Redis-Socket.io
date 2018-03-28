@@ -6,6 +6,8 @@ const bodyParser = require('body-parser');
 const redisSocket = require('socket.io-redis');
 const app = module.exports = express();
 const redis = require('redis');
+const os = require('os');
+console.log(os.cpus());
 app.set('port', process.env.PORT || 3000);
 
 /***** Redis Connection ******/
@@ -16,7 +18,6 @@ redisClient.on('connect',function(){
 });
 
 /***** Redis Connection ******/
-
 const server = app.listen(app.get('port'), () => {
     console.log('Express server listening on port ' + app.get('port'));
 });
@@ -69,23 +70,27 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-    console.log('connection call');
+    console.log('connection call ',process.env.PORT || 3000);
     io.adapter.clients((err, clients) => {
+        console.log('Port : ', process.env.PORT || 3000);
         console.log(clients); // an array containing all connected socket ids
     });
     socket.on('message-all', (data) => {
         io.emit('message-all', data);
+        console.log('Port : ', process.env.PORT || 3000);
     });
 
     socket.on('join', (room) => {
         socket.join(room);
         io.emit('message-all', "Socket " + socket.id + " joined to room " + room);
+        console.log('Port : ', process.env.PORT || 3000);
     });
 
     socket.on('message-room', (data) => {
         const room = data.room;
         const message = data.message;
         io.to(room).emit('message-room', data);
+        console.log('Port : ', process.env.PORT || 3000);
     });
 
 
@@ -93,6 +98,7 @@ io.on('connection', (socket) => {
 });
 
 app.get('/clients', (req, res, next) => {
+    console.log('Port : ', process.env.PORT || 3000);
     res.send(Object.keys(io.connected));
 });
 
