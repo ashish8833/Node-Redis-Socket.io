@@ -1,0 +1,33 @@
+{
+   "config": {
+      "target": "http://18.194.177.135:8080",
+      "socketio" : {
+        "transports" : ["websocket"]
+      },
+      "phases": [
+         {
+            "duration": 10,
+            "arrivalRate": 10
+         }
+      ]
+    },
+   "scenarios": [
+      {
+         "name": "A user that just lurks",
+         "weight": 75,
+         "engine": "socketio",
+         "flow": [
+            {
+                "emit": {
+                  "namespace":"/mynamespace",
+                  "channel": "message-all",
+                  "data": "hello"
+               }
+            },
+            {
+               "think": 1
+            }
+         ]
+      }
+    ]
+}

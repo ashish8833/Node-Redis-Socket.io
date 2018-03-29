@@ -7,16 +7,24 @@ const redisSocket = require('socket.io-redis');
 const app = module.exports = express();
 const redis = require('redis');
 const os = require('os');
-console.log(os.cpus());
+console.log(os.cpus().length);
 app.set('port', process.env.PORT || 3000);
 
 /***** Redis Connection ******/
 
-let redisClient = redis.createClient();
+let redisClient = redis.createClient({
+    host: 'localhost',
+    port: 6379
+});
 redisClient.on('connect',function(){
     console.log('Redis connected')
 });
 
+redisClient.on('error',function() {
+    console.log("Error in Redis");
+});
+
+redisClient.set("users",0);
 /***** Redis Connection ******/
 const server = app.listen(app.get('port'), () => {
     console.log('Express server listening on port ' + app.get('port'));
@@ -71,10 +79,16 @@ app.get('/', (req, res) => {
 
 io.on('connection', (socket) => {
     console.log('connection call ',process.env.PORT || 3000);
-    io.adapter.clients((err, clients) => {
-        console.log('Port : ', process.env.PORT || 3000);
-        console.log(clients); // an array containing all connected socket ids
-    });
+    redisClient.get('users',(err, getUsers) => {
+        console.log('redis call');
+        io.emit('users', parseInt(getUsers) + 1);
+        redisClient.set('users', parseInt(getUsers) + 1);
+        
+    })
+    // io.adapter.clients((err, clients) => {
+    //     console.log('Port : ', process.env.PORT || 3000);
+    //     console.log(clients); // an array containing all connected socket ids
+    // });
     socket.on('message-all', (data) => {
         io.emit('message-all', data);
         console.log('Port : ', process.env.PORT || 3000);
@@ -92,7 +106,13 @@ io.on('connection', (socket) => {
         io.to(room).emit('message-room', data);
         console.log('Port : ', process.env.PORT || 3000);
     });
-
+    socket.on('disconnect',() => {
+        console.log('diconnect call');
+        redisClient.get('users',(err, getUsers) => {
+            redisClient.set('users', parseInt(getUsers) - 1);
+            io.emit('users', parseInt(getUsers) - 1);
+        })
+    });
 
     
 });

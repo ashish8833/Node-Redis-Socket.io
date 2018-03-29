@@ -1,0 +1,12 @@
+config:
+  target: "http://localhyost:3000/mynamespace"
+  phases:
+    - duration: 600
+      arrivalRate: 5
+scenarios:
+  - engine: "socketio"
+    flow: 
+      - emit: 
+          channel: "message-all"
+          data: "Hello"
+      - think: 600

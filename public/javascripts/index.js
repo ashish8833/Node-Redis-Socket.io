@@ -21,6 +21,11 @@
         $('#message-room > ul').append('<li>' + new Date().toString() + ' - room ' + data.room + ' : ' + data.message + '</li>');
     });
 
+    socket.on('users', function(users) {
+        console.log('users call');
+        $("#users").text('Connected users '+users);
+    });
+
     $('#b-all').click(function () {
         var text = $('#i-all').val();
         if (text.length > 0) {
